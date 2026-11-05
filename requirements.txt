@@ -1,7 +1,9 @@
 fastapi[standard]
 SQLAlchemy==2.0.48
 greenlet==3.2.4
-pyodbc
 alembic
 pydantic-settings
 email-validator
+aiosqlite          # driver async cho SQLite (DATABASE_URL mặc định)
+# pyodbc            # chỉ cần khi dùng MSSQL sync; async MSSQL thì dùng aiodbc
+# aiodbc            # chỉ cần khi DATABASE_URL = mssql+aioodbc://... (Windows)

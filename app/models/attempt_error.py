@@ -2,7 +2,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING, Optional
 
-from sqlalchemy import BigInteger, DateTime, ForeignKey, String,JSON, func
+from sqlalchemy import BigInteger, DateTime, ForeignKey, Integer, String, JSON, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base
@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 class AttemptError(Base):
     __tablename__ = "attempt_errors"
 
-    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, index=True)
+    id: Mapped[int] = mapped_column(BigInteger().with_variant(Integer(), 'sqlite'), primary_key=True, index=True)
     attempt_id: Mapped[int] = mapped_column(ForeignKey("attempts.id"), nullable=False)
     error_type: Mapped[str] = mapped_column(String(20), nullable=False)
     severity: Mapped[Optional[str]] = mapped_column(String(20))

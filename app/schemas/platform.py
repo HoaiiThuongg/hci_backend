@@ -1,6 +1,7 @@
 from datetime import datetime
 from decimal import Decimal
 from typing import Any, Dict, List, Optional
+
 from pydantic import BaseModel, Field
 
 
@@ -24,6 +25,12 @@ class LessonProgressDetailResponse(BaseModel):
 
 
 # --- Attempt & Feedback Schemas ---
+class AttemptErrorItem(BaseModel):
+    type: str = Field(..., description="handshape | orientation | location | movement")
+    severity: Optional[str] = None
+    details: Optional[str] = None
+
+
 class AttemptCreate(BaseModel):
     user_id: int
     lesson_id: int
@@ -35,7 +42,10 @@ class AttemptCreate(BaseModel):
     score: Optional[Decimal] = None
     duration_ms: Optional[int] = None
     feedback_mode: str = "adaptive"
-    landmarks_data: Optional[dict] = None  # Dùng nếu cần lưu hoặc phân tích lỗi
+    # FE (phương án B) gửi kèm để BE lưu log — dùng cho thống kê + error-history
+    errors: List[AttemptErrorItem] = []
+    client_feedback_level: Optional[int] = None
+    landmarks_data: Optional[dict] = None
 
 
 class AttemptResponse(BaseModel):
@@ -45,11 +55,16 @@ class AttemptResponse(BaseModel):
     lesson_item_id: int
     status: str
     is_correct: Optional[bool] = None
+    predicted_sign: Optional[str] = None
+    model_confidence: Optional[Decimal] = None
     score: Optional[Decimal] = None
+    duration_ms: Optional[int] = None
+    feedback_mode: str
+    feedback_level_shown: Optional[int] = None
+    is_completed: bool
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
 
 
 class FeedbackResponse(BaseModel):
@@ -83,7 +98,8 @@ class CollectorSampleCreate(BaseModel):
     lesson_item_id: int
     user_id: Optional[int] = None
     label: str
-    landmarks: dict
+    # FE gửi mảng frame [[[x,y,z]×21] × frames]; dict cũng chấp nhận (tương thích cũ)
+    landmarks: Any
     metadata: Optional[dict] = {}
 
 

@@ -432,3 +432,22 @@ Backend quản lý thông tin nội dung bài học và các đường dẫn med
 ---
 
 **Signora - Để mỗi ký hiệu nở hoa.** 🌱
+
+---
+
+## ⚡ Dev nhanh (SQLite — chạy được trên mọi hệ điều hành, cập nhật 2026-11-05)
+
+```bash
+pip install -r requirements.txt     # không cần pyodbc nếu dùng SQLite
+alembic upgrade head                # tạo bảng (async-safe với sqlite+aiosqlite)
+python -m app.seed                  # seed 2 versions + 3 lessons + 11 items + settings
+uvicorn app.main:app --reload       # mặc định port 8000 — đổi: --port 8002 nếu cổng bận
+```
+
+Không cần file `.env` — mặc định `DATABASE_URL=sqlite+aiosqlite:///./dev.db` (file `dev.db` sinh tại chỗ).
+Muốn dùng MSSQL (Windows): tạo `.env` với `DATABASE_URL=mssql+aioodbc://...` và cài `aiodbc`.
+
+Đã sửa (chi tiết trong `../Tuần3_vấn_đề_API_cho_Thương.md`): engine async + SQLite, CORS,
+error envelope `{error_code, message, details}`, POST /attempts lưu attempt_errors +
+feedback_level_shown + response đầy đủ, seed data, POST /users bỏ bắt buộc email,
+statistics by_label, bỏ route trùng, POST /versions/{vid}/lessons hoạt động.
