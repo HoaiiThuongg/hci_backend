@@ -24,7 +24,7 @@ async def get_user_history(user_id: int, db: AsyncSession = Depends(get_db)):
     stmt = (
         select(Attempt)
         .where(Attempt.user_id == user_id)
-        .order_by(Attempt.created_at.desc())
+        .order_by(Attempt.created_at.desc(), Attempt.id.desc())  # id desc: tiebreak khi 2 attempt cùng giây
         .limit(50)
     )
     result = await db.execute(stmt)

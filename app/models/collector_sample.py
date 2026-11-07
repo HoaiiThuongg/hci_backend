@@ -2,7 +2,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING, Optional
 
-from sqlalchemy import JSON, BigInteger, DateTime, ForeignKey, String, Text, func
+from sqlalchemy import JSON, BigInteger, DateTime, ForeignKey, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base
@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 class CollectorSample(Base):
     __tablename__ = "collector_samples"
 
-    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, index=True)
+    id: Mapped[int] = mapped_column(BigInteger().with_variant(Integer(), 'sqlite'), primary_key=True, index=True)
     lesson_item_id: Mapped[int] = mapped_column(ForeignKey("lesson_items.id"), nullable=False)
     user_id: Mapped[Optional[int]] = mapped_column(ForeignKey("users.id"))
     label: Mapped[str] = mapped_column(String(100), nullable=False)

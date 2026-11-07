@@ -1,28 +1,25 @@
-from collections.abc import Generator
+from collections.abc import AsyncGenerator
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from app.core.config import settings
 
-
-engine = create_engine(
+# Engine async — toàn bộ endpoint dùng AsyncSession.
+# SQLite dev: sqlite+aiosqlite:///./dev.db (không cần server nào).
+# MSSQL async: mssql+aioodbc://... (cài package aiodbc trên Windows).
+engine = create_async_engine(
     settings.DATABASE_URL,
     pool_pre_ping=True,
 )
 
-SessionLocal = sessionmaker(
+AsyncSessionLocal = async_sessionmaker(
     bind=engine,
-    class_=Session,
+    class_=AsyncSession,
     autoflush=False,
     expire_on_commit=False,
 )
 
 
-def get_db() -> Generator[Session, None, None]:
-    db = SessionLocal()
-
-    try:
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    async with AsyncSessionLocal() as db:
         yield db
-    finally:
-        db.close()

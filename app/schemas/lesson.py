@@ -42,6 +42,8 @@ class LessonItemResponse(BaseModel):
     description: Optional[str] = None
     media: Dict[str, Any]
     steps: List[Any]
+    # Ground truth 4 tham số {params, confusable_with, hold_ms, trajectory_ref} — input cho error analysis
+    reference_data: Optional[Dict[str, Any]] = None
     order_index: int
     is_active: bool
 

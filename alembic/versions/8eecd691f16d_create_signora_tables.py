@@ -99,7 +99,7 @@ def upgrade() -> None:
     )
     op.create_index(op.f('ix_user_lesson_progress_id'), 'user_lesson_progress', ['id'], unique=False)
     op.create_table('attempts',
-    sa.Column('id', sa.BigInteger(), nullable=False),
+    sa.Column('id', sa.BigInteger().with_variant(sa.Integer(), 'sqlite'), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=False),
     sa.Column('lesson_id', sa.Integer(), nullable=False),
     sa.Column('lesson_item_id', sa.Integer(), nullable=False),
@@ -120,7 +120,7 @@ def upgrade() -> None:
     )
     op.create_index(op.f('ix_attempts_id'), 'attempts', ['id'], unique=False)
     op.create_table('collector_samples',
-    sa.Column('id', sa.BigInteger(), nullable=False),
+    sa.Column('id', sa.BigInteger().with_variant(sa.Integer(), 'sqlite'), nullable=False),
     sa.Column('lesson_item_id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.Column('label', sa.String(length=100), nullable=False),
@@ -135,7 +135,7 @@ def upgrade() -> None:
     )
     op.create_index(op.f('ix_collector_samples_id'), 'collector_samples', ['id'], unique=False)
     op.create_table('attempt_errors',
-    sa.Column('id', sa.BigInteger(), nullable=False),
+    sa.Column('id', sa.BigInteger().with_variant(sa.Integer(), 'sqlite'), nullable=False),
     sa.Column('attempt_id', sa.BigInteger(), nullable=False),
     sa.Column('error_type', sa.String(length=20), nullable=False),
     sa.Column('severity', sa.String(length=20), nullable=True),
@@ -146,7 +146,7 @@ def upgrade() -> None:
     )
     op.create_index(op.f('ix_attempt_errors_id'), 'attempt_errors', ['id'], unique=False)
     op.create_table('feedbacks',
-    sa.Column('id', sa.BigInteger(), nullable=False),
+    sa.Column('id', sa.BigInteger().with_variant(sa.Integer(), 'sqlite'), nullable=False),
     sa.Column('attempt_id', sa.BigInteger(), nullable=False),
     sa.Column('mode', sa.String(length=10), nullable=False),
     sa.Column('level', sa.Integer(), nullable=True),

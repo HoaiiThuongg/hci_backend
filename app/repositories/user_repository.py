@@ -1,36 +1,36 @@
-from sqlalchemy import select
-from sqlalchemy.orm import Session
-
-from app.models.user import User
 from typing import Optional
 
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.models.user import User
+
+
 class UserRepository:
-    def __init__(self, db: Session):
+    def __init__(self, db: AsyncSession):
         self.db = db
 
-    def get_by_id(self, user_id: int) -> Optional[User]:
-        return (
-            self.db.query(User)
-            .filter(User.id == user_id)
-            .first()
-        )
+    async def get_by_id(self, user_id: int) -> Optional[User]:
+        return await self.db.get(User, user_id)
 
-    def get_by_email(self, email: str) -> Optional[User]:
+    async def get_by_email(self, email: str) -> Optional[User]:
         statement = select(User).where(User.email == email)
-        return self.db.scalar(statement)
+        return (await self.db.execute(statement)).scalar_one_or_none()
 
-    def get_all(self) -> list[User]:
+    async def get_by_display_name(self, display_name: str) -> Optional[User]:
+        statement = select(User).where(User.display_name == display_name)
+        return (await self.db.execute(statement)).scalar_one_or_none()
+
+    async def get_all(self) -> list[User]:
         statement = select(User).order_by(User.id)
-        return list(self.db.scalars(statement).all())
+        return list((await self.db.scalars(statement)).all())
 
-    def create(self, email: str, display_name: str) -> Optional[User]:
+    async def create(self, email: Optional[str], display_name: str) -> User:
         user = User(
             email=email,
             display_name=display_name,
         )
-
         self.db.add(user)
-        self.db.commit()
-        self.db.refresh(user)
-
+        await self.db.commit()
+        await self.db.refresh(user)
         return user

@@ -16,17 +16,6 @@ from app.schemas.lesson import (
 router = APIRouter(prefix="", tags=["Lessons"])
 
 
-@router.get("/versions/{version_id}/lessons", response_model=List[LessonResponse])
-async def get_lessons_by_version(
-    version_id: int,
-    user_id: Optional[int] = Query(None, description="ID người dùng để lấy tiến độ (nếu có)"),
-    db: AsyncSession = Depends(get_db),
-):
-    """Lấy danh sách bài học theo version kèm trạng thái của user."""
-    service = LessonService(db)
-    return await service.get_version_lessons(version_id, user_id)
-
-
 @router.get("/lessons/{lesson_id}", response_model=LessonDetailResponse)
 async def get_lesson_detail(
     lesson_id: int,

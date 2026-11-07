@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.schemas.user import UserCreate, UserRead
@@ -17,14 +17,14 @@ router = APIRouter(
     response_model=UserRead,
     status_code=status.HTTP_201_CREATED,
 )
-def create_user(
+async def create_user(
     data: UserCreate,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
 ):
     service = UserService(db)
 
     try:
-        return service.create_user(data)
+        return await service.create_user(data)
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
@@ -36,23 +36,23 @@ def create_user(
     "",
     response_model=list[UserRead],
 )
-def get_users(
-    db: Session = Depends(get_db),
+async def get_users(
+    db: AsyncSession = Depends(get_db),
 ):
     service = UserService(db)
-    return service.get_users()
+    return await service.get_users()
 
 
 @router.get(
     "/{user_id}",
     response_model=UserRead,
 )
-def get_user(
+async def get_user(
     user_id: int,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
 ):
     service = UserService(db)
-    user = service.get_user(user_id)
+    user = await service.get_user(user_id)
 
     if user is None:
         raise HTTPException(

@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories.lesson_repository import LessonRepository
 from app.schemas.lesson import (
+    LessonCreateRequest,
     LessonResponse,
     LessonDetailResponse,
     LessonItemResponse,
@@ -78,3 +79,15 @@ class LessonService:
             active_items=active,
             message="Lesson is ready for practice" if is_available else "Lesson has no active items available"
         )
+
+    async def create_lesson(self, version_id: int, request: LessonCreateRequest) -> LessonDetailResponse:
+        """Tạo bài học mới + items, trả về chi tiết đầy đủ."""
+        from app.models.version import Version
+
+        version = await self.repo.db.get(Version, version_id)
+        if version is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Version not found")
+
+        lesson = await self.repo.create_lesson_with_items(version_id, request)
+        # Re-fetch với selectinload để serialize lesson_items (async không lazy-load được)
+        return await self.get_lesson_detail(lesson.id)

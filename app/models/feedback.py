@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 class Feedback(Base):
     __tablename__ = "feedbacks"
 
-    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, index=True)
+    id: Mapped[int] = mapped_column(BigInteger().with_variant(Integer(), 'sqlite'), primary_key=True, index=True)
     attempt_id: Mapped[int] = mapped_column(ForeignKey("attempts.id"), unique=True, nullable=False)
     mode: Mapped[str] = mapped_column(String(10), nullable=False)
     level: Mapped[Optional[int]] = mapped_column(Integer)

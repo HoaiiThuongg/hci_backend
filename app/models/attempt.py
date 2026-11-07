@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 class Attempt(Base):
     __tablename__ = "attempts"
 
-    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, index=True)
+    id: Mapped[int] = mapped_column(BigInteger().with_variant(Integer(), 'sqlite'), primary_key=True, index=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
     lesson_id: Mapped[int] = mapped_column(ForeignKey("lessons.id"), nullable=False)
     lesson_item_id: Mapped[int] = mapped_column(ForeignKey("lesson_items.id"), nullable=False)

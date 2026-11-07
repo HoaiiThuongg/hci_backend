@@ -51,11 +51,41 @@ def run_migrations_offline() -> None:
         context.run_migrations()
 
 
+def _is_async_url(url: str) -> bool:
+    return any(d in url for d in ("+aiosqlite", "+asyncpg", "+aiomysql", "+aioodbc"))
+
+
 def run_migrations_online() -> None:
+    url = settings.DATABASE_URL
+
+    if _is_async_url(url):
+        # Driver async (mặc định dev: sqlite+aiosqlite) → chạy migration qua async engine
+        import asyncio
+
+        from sqlalchemy.ext.asyncio import async_engine_from_config
+
+        def do_run_migrations(connection) -> None:
+            context.configure(connection=connection, target_metadata=target_metadata, compare_type=True)
+            with context.begin_transaction():
+                context.run_migrations()
+
+        async def run_async() -> None:
+            connectable = async_engine_from_config(
+                {"sqlalchemy.url": url},
+                prefix="sqlalchemy.",
+                poolclass=pool.NullPool,
+            )
+            async with connectable.connect() as connection:
+                await connection.run_sync(do_run_migrations)
+            await connectable.dispose()
+
+        asyncio.run(run_async())
+        return
+
     from sqlalchemy import create_engine
 
     connectable = create_engine(
-        settings.DATABASE_URL,
+        url,
         poolclass=pool.NullPool,
     )
 
