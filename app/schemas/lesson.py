@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Any, Dict, List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class MediaSchema(BaseModel):
@@ -20,7 +20,7 @@ class LessonItemCreateRequest(BaseModel):
     difficulty: Optional[str] = None
     order_index: int
     media: Optional[MediaSchema] = None
-    steps: List[StepSchema] = []
+    steps: List[StepSchema] = Field(default_factory=list)
     reference_data: Optional[dict] = None
 
 
@@ -67,7 +67,7 @@ class LessonResponse(BaseModel):
 
 
 class LessonDetailResponse(LessonResponse):
-    lesson_items: List[LessonItemResponse] = []
+    lesson_items: List[LessonItemResponse] = Field(default_factory=list)
 
 
 class FeedbackConfigResponse(BaseModel):
